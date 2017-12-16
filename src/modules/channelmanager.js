@@ -3,8 +3,8 @@ const __ = require('iterate-js');
 const moment = require('moment');
 const logger = require('../logger.js');
 
-module.exports = function(bot) {
-    bot.manager = {
+module.exports = function(client) {
+    client.manager = {
 
         cleaning: {},
 
@@ -12,7 +12,7 @@ module.exports = function(bot) {
             var msg = msgs.shift();
             if(msg) {
                 msg.delete()
-                    .then(() => { bot.manager.sequentialDelete(msgs, cb); })
+                    .then(() => { client.manager.sequentialDelete(msgs, cb); })
                     .catch(error => logger.error(error));
             } else if(cb)
                 cb();
@@ -20,9 +20,9 @@ module.exports = function(bot) {
 
         cleanChannel: function(config) {
             var cfg = __.options({ name: '', limit: null }, config),
-                channel = bot.client.channels.find('name', cfg.name);
-            if(channel && channel.type == 'text' && !bot.manager.cleaning[cfg.name]) {
-                bot.manager.cleaning[cfg.name] = true;
+                channel = client.client.channels.find('name', cfg.name);
+            if(channel && channel.type == 'text' && !client.manager.cleaning[cfg.name]) {
+                client.manager.cleaning[cfg.name] = true;
                 channel.fetchMessages({ limit: 100 })
                     .then(() => {
                         var msgs = __.sort(channel.messages.array(), { key: v => v.createdTimestamp, dir: 'desc' });
@@ -36,22 +36,22 @@ module.exports = function(bot) {
                         });
                         
                         if(msgs.length > 0) {
-                            bot.manager.sequentialDelete(msgs, () => {
-                                bot.manager.cleaning[cfg.name] = false;
-                                bot.manager.cleanChannel(config);
+                            client.manager.sequentialDelete(msgs, () => {
+                                client.manager.cleaning[cfg.name] = false;
+                                client.manager.cleanChannel(config);
                             });
                         } else
-                            bot.manager.cleaning[cfg.name] = false;
+                            client.manager.cleaning[cfg.name] = false;
                     })
                     .catch(error => {
-                        bot.manager.cleaning[cfg.name] = false;
+                        client.manager.cleaning[cfg.name] = false;
                     });
             }
         },
 
         clean: function() {
-            __.all(bot.config.discord.manage.channels, cfg => {
-                bot.manager.cleanChannel(cfg);
+            __.all(client.config.discord.manage.channels, cfg => {
+                client.manager.cleanChannel(cfg);
             });
         }
 
