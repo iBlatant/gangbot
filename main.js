@@ -1,8 +1,7 @@
-
-const RhythmBot = require('./src/rhythm-bot.js');
+const RhythmBot = require('./src/rhythm-client.js');
 const logger = require('./src/logger.js');
 
-const bot = new RhythmBot({
+const client = new RhythmBot({
     command: {
         symbol: '-' // command symbol trigger
     },
@@ -17,10 +16,10 @@ const bot = new RhythmBot({
     }
 });
 
-bot.connect()
+client.connect()
     .then(() => { 
         logger.log('Listening');
-        bot.listen();
+        client.listen();
     })
     .catch(err => {
         logger.error(err);
