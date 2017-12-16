@@ -1,18 +1,17 @@
-
 const __ = require('iterate-js');
 const fs = require('fs');
 const jsonfile = require('jsonfile');
 
 const playlistPath = '/playlists';
 
-module.exports = function(bot) {
-    bot.playlist = {
+module.exports = function(client) {
+    client.playlist = {
         path: function(name) {
-            return '{0}/{1}/{2}.json'.format(bot.dir, playlistPath, name);
+            return '{0}/{1}/{2}.json'.format(client.dir, playlistPath, name);
         },
-        dir: '{0}/{1}'.format(bot.dir, playlistPath),
+        dir: '{0}/{1}'.format(client.dir, playlistPath),
         save: function(name, list) {
-            var list = __.map(list ? list : bot.queue.queue, x => {
+            var list = __.map(list ? list : client.queue.queue, x => {
                 var temp = {};
                 __.all(x, (value, key) => { 
                     if(key != 'dispatcher' && key != 'playing' && key != 'requestor')
@@ -20,14 +19,14 @@ module.exports = function(bot) {
                 });
                 return temp;
             });
-            jsonfile.writeFileSync(bot.playlist.path(name), { queue: list });
+            jsonfile.writeFileSync(client.playlist.path(name), { queue: list });
         },
         load: function(name) {
-            bot.queue.queue = (jsonfile.readFileSync(bot.playlist.path(name)) || { queue: [] }).queue;
+            client.queue.queue = (jsonfile.readFileSync(client.playlist.path(name)) || { queue: [] }).queue;
         },
         list: function() {
             var playlists = [];
-            fs.readdirSync(bot.playlist.dir).forEach(file => {
+            fs.readdirSync(client.playlist.dir).forEach(file => {
                 var fileparts = file.split('/'),
                     filename = fileparts[fileparts.length - 1].replace('.json', '');
                 
@@ -36,7 +35,7 @@ module.exports = function(bot) {
             return playlists;
         },
         delete: function(name) {
-            fs.unlinkSync(bot.playlist.path(name));
+            fs.unlinkSync(client.playlist.path(name));
         }
     };
 };
