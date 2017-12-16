@@ -1,7 +1,6 @@
-
 const readline = require('readline');
 
-module.exports = function(bot) {
+module.exports = function(client) {
 
     var commands = {
 
@@ -11,7 +10,7 @@ module.exports = function(bot) {
                 channel = parts.shift(),
                 text = parts.join('@');
             
-            var targetguild = bot.client.guilds.find(g => g.name.contains(guild));
+            var targetguild = client.client.guilds.find(g => g.name.contains(guild));
             if(targetguild) {
                 var targetchannel = targetguild.channels.find(c => c.name.contains(channel));
                 if(targetchannel)
@@ -20,7 +19,7 @@ module.exports = function(bot) {
         },
 
         exit: function(reader) {
-            bot.disconnect()
+            client.disconnect()
                 .then(() => {
                     reader.close();
                 });
@@ -28,7 +27,7 @@ module.exports = function(bot) {
 
     };
 
-    bot.console = {
+    client.console = {
         listen: function() {
             var rl = readline.createInterface({
                 input: process.stdin,
