@@ -3,17 +3,17 @@ const __ = require('iterate-js');
 const moment = require('moment');
 const logger = require('../logger.js');
 
-module.exports = function(bot) {
+module.exports = function(client) {
     var STATE = __.enum({
         READY: 0,
         PLAYING: 1,
         PAUSED: 2
     });
 
-    bot.clock = new __.lib.StopWatch({
+    client.clock = new __.lib.StopWatch({
         onTick: (time) => {
-            if(bot.online) {
-                var track = bot.queue.first,
+            if(client.online) {
+                var track = client.queue.first,
                     title = '',
                     currentTime = 0,
                     totalTime = 0;
@@ -31,23 +31,23 @@ module.exports = function(bot) {
                     totalTime = end.format(format);
                 }
                 
-                if(bot.queue.count > 0 && bot.queue.first.playing) {
-                    if(bot.queue.first.paused)
-                        bot.state = STATE.PAUSED;
+                if(client.queue.count > 0 && client.queue.first.playing) {
+                    if(client.queue.first.paused)
+                        client.state = STATE.PAUSED;
                     else
-                        bot.state = STATE.PLAYING;
+                        client.state = STATE.PLAYING;
                 } else
-                    bot.state = STATE.READY;
+                    client.state = STATE.READY;
 
-                var text = __.switch(bot.state, {
-                    [STATE.READY]: `Ready: ${bot.queue.count} in queue.`,
+                var text = __.switch(client.state, {
+                    [STATE.READY]: `Ready: ${client.queue.count} in queue.`,
                     [STATE.PLAYING]: `${currentTime}/${totalTime}`,
                     [STATE.PAUSED]: `Paused: ${title} - ${currentTime} / ${totalTime}`
                 });
 
-                if(__.prop(bot.client, 'user.presence.game.name') != text) {
+                if(__.prop(client.client, 'user.presence.game.name') != text) {
                     logger.log(`Status: ${text}`);
-                    bot.client.user.setGame(text);
+                    client.client.user.setGame(text);
                 }
             }
         },
