@@ -1,7 +1,7 @@
 const __ = require('iterate-js');
 
-module.exports = function(bot, config) {
-    bot.config = new __.lib.Config({
+module.exports = function(client, config) {
+    client.config = new __.lib.Config({
         auto: new __.lib.Config({
             deafen: false,
             pause: false,
@@ -36,5 +36,5 @@ module.exports = function(bot, config) {
             volume: 0.5
         })
     });
-    bot.config.update(config);
+    client.config.update(config);
 };
